@@ -69,7 +69,7 @@ class FullyConnectedNet(nn.Module):
 def maxpoolcat(x1, x2):
     x1 = x1.max(0)[0]
     x2 = x2.max(0)[0]
-    x = torch.cat((x1, x2), 1)
+    x = torch.cat((x1, x2), 1) #TODO Jan -- axis was 1 instead of 0
     return x
 
 

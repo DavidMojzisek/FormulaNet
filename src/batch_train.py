@@ -67,7 +67,7 @@ def parse_args():
         '--max_pair',
         type=int,
         help='Max pair cut-off line for batching',
-        default=200000)
+        default=50000)
     parser.add_argument('--epoch', '-e', type=int, help='Number of epoch', default=5)
     parser.add_argument(
         '--optim',
@@ -110,7 +110,7 @@ def parse_args():
         type=str,
         help='Choose the type of the loss used in the network',
         default='concat')
-    parser.add_argument('--worker', type=int, help='Number of workers', default=5)
+    parser.add_argument('--worker', type=int, help='Number of workers', default=1)
     parser.add_argument(
         '--binary',
         action='store_false',
@@ -188,6 +188,9 @@ def main():
         loaders.append(loader)
         loader.start_reader()
 
+    cuda_test = torch.cuda.is_available()
+    cuda_tensor = torch.randn(10).cuda()
+
     net, mid_net, loss_fn = create_models(args, loaders[0], allow_resume=True)
     # Use fake modules to replace the real ones
     net = FakeModule(net)
@@ -195,8 +198,8 @@ def main():
         mid_net = FakeModule(mid_net)
     for i in range(len(loss_fn)):
         loss_fn[i] = FakeModule(loss_fn[i])
-
     opt = get_opt(net, mid_net, loss_fn, args)
+
 
     inqueues = []
     outqueues = []

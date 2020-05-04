@@ -6,7 +6,7 @@ import torch
 import math
 import os
 import sys
-sys.path.insert(0, 'data_util')
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__))+'/data_util')
 import pickle
 from torch.multiprocessing import Process, Queue
 from torch.autograd import Variable

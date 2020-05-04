@@ -8,7 +8,7 @@ import torch
 
 from holstep_parser import graph_from_hol_stmt
 from holstep_parser import tree_from_hol_stmt
-from pathlib import Path
+
 
 def count_stmt(path):
     '''Count the number of the statements in the files of the given folder
@@ -46,12 +46,7 @@ def generate_dataset(path, output, partition, converter, files=None):
         Number of the partition for this dataset (i.e. # of files)
     '''
     digits = len(str(partition))
-    # create output_files
-
-    for i in range(partition):
-        path_to_output_file = os.path.join(output, 'holstep' + format(i, "0{}d".format(digits)))
-        with open(path_to_output_file, 'ab') as f:
-            pickle.dump([],f)
+    outputs = [[] for _ in range(partition)]
     if files is None:
         files = os.listdir(path)
     for i, fname in enumerate(files):
@@ -68,21 +63,15 @@ def generate_dataset(path, output, partition, converter, files=None):
                     statement = converter(line[2:], next(f)[2:])
                     flag = 1 if line[0] == '+' else 0
                     record = flag, conjecture, statement
-                    ix = random.randint(0, partition-1)
-                    path_to_output_file = os.path.join(output, 'holstep' + format(ix, "0{}d".format(digits)))
-                    with open(path_to_output_file, 'ab') as choosed_pickle:
-                        #loaded_arr = pickle.load(choosed_pickle)
-                        #print(len(loaded_arr))
-                        pickle.dump(record,choosed_pickle)
-                    choosed_pickle.close()
+                    outputs[random.randint(0, partition-1)].append(record)
 
     # Save dataset
-    # for i, data in enumerate(outputs):
-    #     with open(
-    #             os.path.join(output, 'holstep' + format(i, "0{}d".format(digits))),
-    #             'wb') as f:
-    #         print('Saving to file {}/{}'.format(i + 1, partition))
-    #         pickle.dump(data, f, pickle.HIGHEST_PROTOCOL)
+    for i, data in enumerate(outputs):
+        with open(
+                os.path.join(output, 'holstep' + format(i, "0{}d".format(digits))),
+                'wb') as f:
+            print('Saving to file {}/{}'.format(i + 1, partition))
+            pickle.dump(data, f, pickle.HIGHEST_PROTOCOL)
 
 
 if __name__ == '__main__':
